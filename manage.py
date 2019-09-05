@@ -5,9 +5,6 @@ from flask_script import Manager,Server
 from flask_migrate import Migrate, MigrateCommand
 
 from application import create_app, db
-#https://medium.com/@dushan14/create-a-web-application-with-python-flask-postgresql-and-deploy-on-heroku-243d548335cc
-#https://flask-sqlalchemy.palletsprojects.com/en/2.x/quickstart/
-
 
 app = create_app()
 app.app_context().push()

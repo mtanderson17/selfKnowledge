@@ -1,5 +1,4 @@
 import datetime
-#from sqlalchemy_utils import EmailType, PasswordType
 
 from application import db
 

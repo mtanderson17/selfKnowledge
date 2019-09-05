@@ -3,6 +3,7 @@ from wtforms import validators, StringField, PasswordField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import ValidationError
 
+from application import db
 from user.models import User
 
 class RegisterForm(Form):
@@ -20,5 +21,7 @@ class RegisterForm(Form):
     confirm = PasswordField('Repeat Password')
     
     def validate_email(form, field):
-        if User.objects.filter(email=field.data).first():
+        
+
+        if bool(User.query.filter_by(email=field.data).first()):
             raise ValidationError("Email is already in use")
