@@ -14,3 +14,7 @@ https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database
 https://www.udemy.com/course/advanced-python-flask/learn/lecture/5370540?start=75#overview
 
 
+#from application import create_app
+#app = create_app()
+#app.app_context().push()
+#from application import User

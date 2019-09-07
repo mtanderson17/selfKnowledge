@@ -24,6 +24,7 @@ def register():
             )
         db.session.add(user)
         db.session.commit()
-        new_user = User.query.filter_by(email=form.email.data).first()
-        return form.email.data
+        #New user doesn't appear to be returning anything
+        new_user = User.query.filter_by(email=form.email.data).first().email
+        return f'{new_user} registered'
     return render_template('user/register.html', form=form)
