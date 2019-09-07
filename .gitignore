@@ -10,3 +10,5 @@ venv
 settings.py
 static/images
 sk
+.vscode
+

@@ -21,7 +21,5 @@ class RegisterForm(Form):
     confirm = PasswordField('Repeat Password')
     
     def validate_email(form, field):
-        
-
         if bool(User.query.filter_by(email=field.data).first()):
             raise ValidationError("Email is already in use")
