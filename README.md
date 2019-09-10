@@ -13,6 +13,7 @@ https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database
 
 https://www.udemy.com/course/advanced-python-flask/learn/lecture/5370540?start=75#overview
 
+https://stackoverflow.com/questions/16573802/flask-sqlalchemy-how-to-delete-all-rows-in-a-single-table
 
 #from application import create_app
 #app = create_app()

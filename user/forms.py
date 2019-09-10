@@ -23,3 +23,15 @@ class RegisterForm(Form):
     def validate_email(form, field):
         if bool(User.query.filter_by(email=field.data).first()):
             raise ValidationError("Email is already in use")
+
+class LoginForm(Form):
+    email = EmailField('Email', [
+        validators.DataRequired()
+        ])
+    password = PasswordField('Password', [
+        validators.DataRequired(),
+        validators.length(min=4, max=80)
+        ])
+
+class HabitForm(Form):
+    habit_name = StringField('New Habit', [validators.DataRequired()])
