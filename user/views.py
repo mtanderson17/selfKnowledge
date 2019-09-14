@@ -1,13 +1,20 @@
 
-from flask import Blueprint, render_template, request, redirect, session, url_for,abort
+from flask import Blueprint, render_template, request, redirect, session, url_for,abort, flash
 import bcrypt
+import calendar
+import datetime
 
 from application import db
 from user.models import User, Habit
 from user.forms import RegisterForm, LoginForm, HabitForm
-from user.decorators import login_required
+from user.decorators import login_required, confirmation_required
 
 user_app = Blueprint('user_app', __name__)
+
+#DATETIME CONFIG - is this the best place to put it?
+now = datetime.datetime.now()
+year = now.year
+month = now.month
 
 @user_app.route('/register', methods=('GET', 'POST'))
 def register():
@@ -58,29 +65,69 @@ def login():
 def logout():
     session.pop('username')
     return redirect(url_for('user_app.login'))
-    
-@user_app.route('/profile', methods=('GET', 'POST'))
-def profile():
-    return render_template('user/profile.html')
+
+@user_app.route('/profile')
+@user_app.route('/profile/<year>/<month>', methods=('GET', 'POST'))
+def profile(year=None,month=None):
+
+    if year is None or month is None:
+        year = datetime.datetime.now().year
+        month = datetime.datetime.now().month
+
+    year = int(year)
+    month = int(month)
+
+    cal = calendar.HTMLCalendar().formatmonth(year,month)
+
+    return render_template('user/profile.html', calendar = cal)
 
 @user_app.route('/add_habit', methods=('GET', 'POST'))
 @login_required
-def add_habit():
+def add_habit(message=None):
     error = None
-    message = None
+  
     user = User.query.filter_by(email=session.get('username')).first()
-
+    habits = Habit.query.filter_by(user_id=user.id).all()
+    habits_list = [habit.habit_name for habit in habits]
     form = HabitForm()
 
     if form.validate_on_submit():
+        new_habit_name = form.habit_name.data.lower()
+        if new_habit_name in habits_list:
+            error = f'habit {new_habit_name} exists'
+            return  render_template("user/add_habit.html", form=form, error=error, message=message,habits=habits )
 
         habit = Habit(
             user_id = user.id,
-            habit_name = form.habit.data
+            habit_name = new_habit_name
         )
-
         db.session.add(habit)
         db.session.commit()
 
-        return  render_template("user/add_habit.html", form=form, error=error, message=message, user=user)
-    return render_template('user/add_habit.html', form=form,user=user,message=message,error=error)
+        
+        message =  f'added {new_habit_name} successfully'
+        new_habits = Habit.query.filter_by(user_id=user.id).all()
+
+        return  render_template("user/add_habit.html",form=form,error=error,message=message,habits=new_habits)
+    return render_template('user/add_habit.html', form=form,message=message,error=error, habits=habits)
+
+@user_app.route('/delete_habit/<habit>',methods=('GET','POST'))
+@login_required
+def delete_habit(habit):
+    error = None
+    message = None
+    user = User.query.filter_by(email=session.get('username')).first()
+    del_habit = Habit.query.filter_by(user_id=user.id, habit_name=habit).first()
+
+    db.session.delete(del_habit)
+    db.session.commit()
+    
+    return redirect(url_for('user_app.add_habit',message=f'{habit} deleted'))
+
+@user_app.route("/day/<year>/<month>/<day>")
+@login_required
+def day(day,month,year):
+    
+
+
+    return "test"
