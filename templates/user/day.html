@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Your Day{% endblock %}
+
+{% block content %}
+
+{% include "navbar.html" %}
+
+{% if error %}
+<div class="error text-danger">{{ error }}</div>
+{% endif %}
+
+{% if message %}
+<div class="alert alert-success" role="alert">{{ message }}</div>
+{% endif %}
+
+{% from "_formhelpers.html" import render_field %}
+
+<h3> {{ day }} - {{ month }} - {{ year }} </h3>
+
+{% for habit,form in form_dict.items() %}
+    <h4>{{ habit.habit_name }} </h4>
+    <form method="POST" action="{{ url_for('.day',day_value=day,month=month,year=year)}}" role="form">
+
+    {{ form.hidden_tag() }}
+
+    {{ render_field(form.habit_complete, class='form-control') }}
+    {{ render_field(form.day_desc, class='form-control') }}
+    <input value = {{habit.id}} type="hidden" name="habit_id">
+
+    <button type="submit" class="btn btn-default">Log Habit</button>
+
+    </form>
+{% endfor %}
+
+
+{% endblock %}

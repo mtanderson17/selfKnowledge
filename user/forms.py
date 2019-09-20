@@ -1,7 +1,8 @@
 from flask_wtf import Form
-from wtforms import validators, StringField, PasswordField
+from wtforms import validators, StringField, PasswordField, BooleanField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import ValidationError
+from wtforms.widgets import TextArea
 
 from application import db
 from user.models import User
@@ -35,3 +36,7 @@ class LoginForm(Form):
 
 class HabitForm(Form):
     habit_name = StringField('New Habit', [validators.DataRequired()])
+
+class DayForm(Form):
+    habit_complete = BooleanField("Complete")
+    day_desc = StringField('Desc', widget=TextArea())

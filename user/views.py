@@ -5,16 +5,12 @@ import calendar
 import datetime
 
 from application import db
-from user.models import User, Habit
-from user.forms import RegisterForm, LoginForm, HabitForm
+from user.models import User, Habit,Day
+from user.forms import RegisterForm, LoginForm, HabitForm,DayForm
 from user.decorators import login_required, confirmation_required
 
 user_app = Blueprint('user_app', __name__)
 
-#DATETIME CONFIG - is this the best place to put it?
-now = datetime.datetime.now()
-year = now.year
-month = now.month
 
 @user_app.route('/register', methods=('GET', 'POST'))
 def register():
@@ -79,7 +75,7 @@ def profile(year=None,month=None):
 
     cal = calendar.HTMLCalendar().formatmonth(year,month)
 
-    return render_template('user/profile.html', calendar = cal)
+    return render_template('user/profile.html', calendar = cal,month=month,year=year)
 
 @user_app.route('/add_habit', methods=('GET', 'POST'))
 @login_required
@@ -124,10 +120,53 @@ def delete_habit(habit):
     
     return redirect(url_for('user_app.add_habit',message=f'{habit} deleted'))
 
-@user_app.route("/day/<year>/<month>/<day>")
+@user_app.route("/day/<year>/<month>/<day_value>",methods=("GET","POST"))
 @login_required
-def day(day,month,year):
+def day(year,month,day_value):
+    error = None
+    message = None
+    form = DayForm()
+
+    date = datetime.date(int(year),int(month),int(day_value))
+
+    user = User.query.filter_by(email=session.get('username')).first()
+    habits = Habit.query.filter_by(user_id=user.id).all()
+
+    if form.validate_on_submit():
+        habit_id = request.form.get("habit_id") #form hidden input
+
+        #Updating day by deleting record and writing new one, probably better way to do this
+        day_info = Day.query.filter_by(user_id=user.id,habit_id = habit_id, date=date).first()
+        if day_info:
+            db.session.delete(day_info)
+            db.session.commit()
+
+        day = Day(
+            date = date,
+            habit_id = habit_id,
+            user_id = user.id,
+            habit_complete = form.habit_complete.data,
+            day_desc = form.day_desc.data
+        )
+        db.session.add(day)
+        db.session.commit()
+
+        return redirect(url_for("user_app.day",day_value=day_value,month=month,year=year))
     
+   
+    #if there is already information in days then prepopulate forms
+    form_dict = {}
+    for habit in habits:
+        dayinfo = Day.query.filter_by(user_id=user.id,habit_id = habit.id, date=date).first()
+        if dayinfo:
+            form = DayForm(obj=dayinfo)
+        else:
+            form = DayForm()
+        form_dict[habit] = form
 
+    #This does not appear to work
+    if habits is None:
+        error = 'Go add some habits!'
 
-    return "test"
+    return render_template('user/day.html',message=message,error=error,day=day_value,month=month,year=year,
+    form_dict=form_dict,habits=habits)
