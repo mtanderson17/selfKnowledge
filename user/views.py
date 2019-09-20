@@ -3,6 +3,7 @@ from flask import Blueprint, render_template, request, redirect, session, url_fo
 import bcrypt
 import calendar
 import datetime
+from bs4 import BeautifulSoup
 
 from application import db
 from user.models import User, Habit,Day
@@ -74,8 +75,11 @@ def profile(year=None,month=None):
     month = int(month)
 
     cal = calendar.HTMLCalendar().formatmonth(year,month)
+    soup = BeautifulSoup(cal, 'html.parser')
+    for td in soup('td'):
+        td.wrap(soup.new_tag("a",**{"href":"www.google.com"}))
 
-    return render_template('user/profile.html', calendar = cal,month=month,year=year)
+    return render_template('user/profile.html', calendar = soup,month=month,year=year)
 
 @user_app.route('/add_habit', methods=('GET', 'POST'))
 @login_required
