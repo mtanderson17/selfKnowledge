@@ -4,7 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+        {{ moment.include_jquery() }}
+        {{ moment.include_moment() }}
+
     <title>{% block title %}{% endblock %}</title>
+
 
     <!-- Bootstrap -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
@@ -26,6 +30,7 @@
         <hr />
         <footer>
           &copy; self.Knowledge 
+          <p>The current date and time is: {{ moment().format('MMMM Do YYYY, h:mm:ss a') }}.</p>
         </footer>
       </div>
       
