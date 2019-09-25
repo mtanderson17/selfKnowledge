@@ -3,12 +3,14 @@ from flask import Blueprint, render_template, request, redirect, session, url_fo
 import bcrypt
 import calendar
 import datetime
+from dateutil.relativedelta import relativedelta
 from bs4 import BeautifulSoup
 
 from application import db
 from user.models import User, Habit,Day
 from user.forms import RegisterForm, LoginForm, HabitForm,DayForm
 from user.decorators import login_required, confirmation_required
+from utilities.common import get_monthdelta_ints
 
 user_app = Blueprint('user_app', __name__)
 
@@ -74,12 +76,30 @@ def profile(year=None,month=None):
     year = int(year)
     month = int(month)
 
+    #Values for next and previous button
+    date = datetime.date(year,month,1)
+    _,prev_month,prev_year = get_monthdelta_ints(date,months=-1)
+    _,next_month,next_year = get_monthdelta_ints(date,months=1)
+    
+
     cal = calendar.HTMLCalendar().formatmonth(year,month)
     soup = BeautifulSoup(cal, 'html.parser')
     for td in soup('td'):
-        td.wrap(soup.new_tag("a",**{"href":"www.google.com"}))
+        try:
+            day = int(td.text)
+            url = f"/day/{year}/{month}/{day}"
+            day_url_tag = soup.new_tag("a",href=url)
+            day_url_tag.string = str(day) #value of the date, may want to change this to whole td later
+            td.string.replace_with(day_url_tag) # take '1' and replace with <a href=url> 1 </a>
+        except:
+            pass
+    html_cal = str(soup.prettify('utf-8',formatter=None))
+    html_cal = html_cal[2:-1] #replace the b'' not sure why thats there
+    html_cal = html_cal.replace("\\n","")
+    html_cal = html_cal.replace("\\","")
 
-    return render_template('user/profile.html', calendar = soup,month=month,year=year)
+    return render_template('user/profile.html', calendar = html_cal,month=month,year=year, prev_month = prev_month, 
+    prev_year = prev_year,next_month=next_month,next_year=next_year)
 
 @user_app.route('/add_habit', methods=('GET', 'POST'))
 @login_required
@@ -133,6 +153,11 @@ def day(year,month,day_value):
 
     date = datetime.date(int(year),int(month),int(day_value))
 
+    #Values for next and previous button
+    prev_day,prev_month,prev_year = get_monthdelta_ints(date,days=-1)
+    next_day,next_month,next_year = get_monthdelta_ints(date,days=1)
+
+    #Get user and habits
     user = User.query.filter_by(email=session.get('username')).first()
     habits = Habit.query.filter_by(user_id=user.id).all()
 
@@ -168,9 +193,11 @@ def day(year,month,day_value):
             form = DayForm()
         form_dict[habit] = form
 
+    #TODO:
     #This does not appear to work
     if habits is None:
         error = 'Go add some habits!'
 
     return render_template('user/day.html',message=message,error=error,day=day_value,month=month,year=year,
+    prev_day = prev_day, prev_month = prev_month, prev_year = prev_year, next_day = next_day, next_month = next_month, next_year = next_year,
     form_dict=form_dict,habits=habits)

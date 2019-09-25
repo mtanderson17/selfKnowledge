@@ -6,6 +6,11 @@
 
 {% include "navbar.html" %}
 
+<ul class="pager">
+    <li class="previous"><a href ="{{url_for('.profile',month=prev_month,year=prev_year)}}">Previous Month</a></li>
+    <li class="next"><a href="{{url_for('.profile',month=next_month,year=next_year)}}">Next Month</a></li>
+</ul>
+
 {{ calendar | safe}}
 
 {% endblock %}

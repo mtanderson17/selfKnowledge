@@ -29,6 +29,7 @@ class Habit(db.Model):
     id = db.Column(db.Integer(),primary_key=True)
     user_id = db.Column(db.Integer(),db.ForeignKey('users.id'))
     habit_name = db.Column(db.String(),nullable=False)
+    habit_create_date = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
 
     user = relationship("User", back_populates="habits")
     days = relationship("Day", back_populates='habit',cascade="all, delete, delete-orphan")

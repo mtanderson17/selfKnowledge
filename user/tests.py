@@ -105,6 +105,26 @@ class UserTest(unittest.TestCase):
 
         assert day_info.day_desc == 'testing'
 
+    def test_day_buttons(self):
+        #Test that previous and next day buttons in day view work
+
+        assert 1 == 1
+
+    def test_profile_cal_urls(self):
+        #Test that the urls in the calendar go to the days
+
+        assert 1 == 1
+
+    def test_profile_buttons(self):
+        #Test that previous and next buttons in profile work
+
+        assert 1 == 1
+
+    def test_gototoday(self):
+        #Test that the 'Go To Today' URL works 
+
+    
+
         
 
         
