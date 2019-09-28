@@ -122,6 +122,9 @@ class UserTest(unittest.TestCase):
 
     def test_gototoday(self):
         #Test that the 'Go To Today' URL works 
+        today = datetime.datetime.utcnow()
+
+        assert 1 == 1
 
     
 

@@ -1,7 +1,15 @@
 import datetime
+import enum 
 from sqlalchemy.orm import relationship
 
 from application import db
+
+
+
+class UserType(enum.Enum):
+    ADMIN = 'ADMIN'
+    FREE = 'FREE'
+    PAID = 'PAID'
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -11,6 +19,7 @@ class User(db.Model):
     email = db.Column(db.String(),unique=True,nullable=False)
     password = db.Column(db.String(),nullable=False)
     created_date = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
+    user_type = db.Column(db.Enum(UserType))
 
     habits = relationship("Habit", back_populates="user", cascade="all, delete, delete-orphan")
 
@@ -21,7 +30,7 @@ class User(db.Model):
 
 
     def __repr__(self):
-        return '<id {}>'.format(self.id)
+        return self.email
     
 class Habit(db.Model):
     __tablename__ = 'habits'
