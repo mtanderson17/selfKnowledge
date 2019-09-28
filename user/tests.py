@@ -1,5 +1,6 @@
 import unittest
 from flask import session
+from flask_login import current_user
 import datetime
 
 from application import create_app as create_app_base
@@ -13,6 +14,7 @@ class UserTest(unittest.TestCase):
     def setUp(self):
         self.app_factory = self.create_app()
         
+        #There has to be a better way to do this
         @self.app_factory.context_processor
         def inject_now():
             return {'now': datetime.datetime.utcnow()}
@@ -48,7 +50,7 @@ class UserTest(unittest.TestCase):
         # check the session is set
         with self.app as c:
             rv = c.get('/')
-            assert session.get('username') == self.user_dict()['email']
+            assert current_user.email == self.user_dict()['email']
 
     def test_add_habit(self):
         # create user

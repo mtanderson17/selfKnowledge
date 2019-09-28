@@ -1,6 +1,6 @@
 
 from flask import Blueprint, render_template, request, redirect, session, url_for,abort, flash
-import bcrypt
+from flask_login import login_required, current_user
 import calendar
 import datetime
 from dateutil.relativedelta import relativedelta
@@ -8,65 +8,15 @@ from bs4 import BeautifulSoup
 
 from application import db
 from user.models import User, Habit,Day
-from user.forms import RegisterForm, LoginForm, HabitForm,DayForm
-from user.decorators import login_required, confirmation_required
+from user.forms import HabitForm,DayForm
 from utilities.common import get_monthdelta_ints
 
 user_app = Blueprint('user_app', __name__)
 
 
-@user_app.route('/register', methods=('GET', 'POST'))
-def register():
-    form = RegisterForm()
-    if form.validate_on_submit():
-        salt = bcrypt.gensalt()
-        hashed_password = bcrypt.hashpw(form.password.data.encode('utf-8'), salt)
-        user = User(
-            password=hashed_password.decode('utf-8'),
-            email=form.email.data
-            )
-        db.session.add(user)
-        db.session.commit()
-       
-        new_user = User.query.filter_by(email=form.email.data).first().email
-        return f'{new_user} registered'
-    return render_template('user/register.html', form=form)
-
-@user_app.route('/login', methods=('GET', 'POST'))
-def login():
-    form = LoginForm()
-    error = None
-    
-    #What does this do?
-    if request.method == 'GET' and request.args.get('next'):
-        session['next'] = request.args.get('next')
-        
-    if form.validate_on_submit():
-        user = User.query.filter_by(
-            email=form.email.data
-            ).first()
-        if user:
-            if bcrypt.hashpw(form.password.data.encode('utf-8'), user.password.encode('utf-8')) == user.password.encode('utf-8'):
-                session['username'] = form.email.data
-                if 'next' in session:
-                    next = session.get('next')
-                    session.pop('next')
-                    return redirect(next)
-                else:
-                    return redirect(url_for('user_app.profile'))
-            else:
-                user = None
-        if not user:
-            error = 'Incorrect credentials'
-    return render_template('user/login.html', form=form, error=error)
-    
-@user_app.route('/logout', methods=('GET', 'POST'))
-def logout():
-    session.pop('username')
-    return redirect(url_for('user_app.login'))
-
 @user_app.route('/profile')
 @user_app.route('/profile/<year>/<month>', methods=('GET', 'POST'))
+@login_required
 def profile(year=None,month=None):
 
     if year is None or month is None:
@@ -106,7 +56,7 @@ def profile(year=None,month=None):
 def add_habit(message=None):
     error = None
   
-    user = User.query.filter_by(email=session.get('username')).first()
+    user = current_user
     habits = Habit.query.filter_by(user_id=user.id).all()
     habits_list = [habit.habit_name for habit in habits]
     form = HabitForm()
@@ -136,7 +86,7 @@ def add_habit(message=None):
 def delete_habit(habit):
     error = None
     message = None
-    user = User.query.filter_by(email=session.get('username')).first()
+    user = current_user
     del_habit = Habit.query.filter_by(user_id=user.id, habit_name=habit).first()
 
     db.session.delete(del_habit)
@@ -158,7 +108,7 @@ def day(year,month,day_value):
     next_day,next_month,next_year = get_monthdelta_ints(date,days=1)
 
     #Get user and habits
-    user = User.query.filter_by(email=session.get('username')).first()
+    user = current_user
     habits = Habit.query.filter_by(user_id=user.id).all()
 
     if form.validate_on_submit():

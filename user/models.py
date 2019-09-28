@@ -1,6 +1,7 @@
 import datetime
 import enum 
 from sqlalchemy.orm import relationship
+from flask_login import UserMixin
 
 from application import db
 
@@ -11,7 +12,7 @@ class UserTypeModel(enum.Enum):
     FREE = 'FREE'
     PAID = 'PAID'
 
-class User(db.Model):
+class User(UserMixin,db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -19,7 +20,7 @@ class User(db.Model):
     email = db.Column(db.String(),unique=True,nullable=False)
     password = db.Column(db.String(),nullable=False)
     created_date = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
-    user_type = db.Column(db.Enum(UserTypeModel))
+    user_type = db.Column(db.Enum(UserTypeModel), default = UserTypeModel.FREE)
 
     habits = relationship("Habit", back_populates="user", cascade="all, delete, delete-orphan")
 
