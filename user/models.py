@@ -6,7 +6,7 @@ from application import db
 
 
 
-class UserType(enum.Enum):
+class UserTypeModel(enum.Enum):
     ADMIN = 'ADMIN'
     FREE = 'FREE'
     PAID = 'PAID'
@@ -19,15 +19,13 @@ class User(db.Model):
     email = db.Column(db.String(),unique=True,nullable=False)
     password = db.Column(db.String(),nullable=False)
     created_date = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
-    user_type = db.Column(db.Enum(UserType))
+    user_type = db.Column(db.Enum(UserTypeModel))
 
     habits = relationship("Habit", back_populates="user", cascade="all, delete, delete-orphan")
-
 
     def __init__(self, email, password):
         self.password = password
         self.email = email 
-
 
     def __repr__(self):
         return self.email

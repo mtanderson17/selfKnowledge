@@ -12,6 +12,11 @@ class UserTest(unittest.TestCase):
         
     def setUp(self):
         self.app_factory = self.create_app()
+        
+        @self.app_factory.context_processor
+        def inject_now():
+            return {'now': datetime.datetime.utcnow()}
+
         self.app = self.app_factory.test_client()
        
 

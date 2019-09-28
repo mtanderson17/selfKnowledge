@@ -7,6 +7,7 @@ from user.models import User,Habit,Day
 
 admin_app = Blueprint('admin_app', __name__)
 
+
 class ChildViewHabit(ModelView):
     column_display_pk = True 
     column_hide_backrefs = False

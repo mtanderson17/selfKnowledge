@@ -7,8 +7,6 @@ db = SQLAlchemy()
 moment = Moment()
 admin = Admin()
 
-from user.models import User
-
 def create_app(config_obj = 'settings.DevelopmentConfig',**config_overrides):
     app = Flask(__name__)
 
