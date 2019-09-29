@@ -133,6 +133,10 @@ class UserTest(unittest.TestCase):
 
         assert 1 == 1
 
+    def test_file_upload(self):
+
+        assert 1 == 1 
+
     
 
         

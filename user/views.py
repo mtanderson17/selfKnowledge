@@ -103,7 +103,7 @@ def day(year,month,day_value):
     error = None
     message = None
     form = DayForm()
-
+    
     date = datetime.date(int(year),int(month),int(day_value))
 
     #Values for next and previous button
