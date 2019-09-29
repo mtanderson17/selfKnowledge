@@ -1,15 +1,18 @@
 
-from flask import Blueprint, render_template, request, redirect, session, url_for,abort, flash
+from flask import Blueprint,render_template, request, redirect, session, url_for,abort, flash,jsonify
 from flask_login import login_required, current_user
+import flask_excel as excel
 import calendar
 import datetime
 from dateutil.relativedelta import relativedelta
 from bs4 import BeautifulSoup
+import json
+
 
 from application import db
 from user.models import User, Habit,Day
 from user.forms import HabitForm,DayForm
-from utilities.common import get_monthdelta_ints
+from utilities.common import get_monthdelta_ints, process_file_upload
 
 user_app = Blueprint('user_app', __name__)
 
@@ -151,3 +154,23 @@ def day(year,month,day_value):
     return render_template('user/day.html',message=message,error=error,day=day_value,month=month,year=year,
     prev_day = prev_day, prev_month = prev_month, prev_year = prev_year, next_day = next_day, next_month = next_month, next_year = next_year,
     form_dict=form_dict,habits=habits)
+
+
+@user_app.route('/manage_account',methods=('GET','POST'))
+@login_required
+def manage_account():
+    return render_template('user/manage_account.html')
+
+@user_app.route('/upload_data',methods=('GET','POST'))
+@login_required
+def upload_data():
+    if request.method == 'POST':
+        try:
+            json_data = {"result": request.get_array(field_name='file')}
+            flash("File uploaded successfully",'SUCCESS')
+        except:
+            flash('File Upload Error! - ensure extension is .xlsx, .xls, .xlsx, .csv - ensure first column is valid date - ensure column names align to habits','ERROR')
+
+        process_file_upload(json_data)
+        return redirect(url_for('user_app.manage_account'))
+    return redirect(url_for("user_app.manage_account"))

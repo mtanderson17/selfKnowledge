@@ -19,13 +19,13 @@
 <h4> {{ month }} - {{ day }} - {{ year }} </h4>
 
 <ul class="pager">
-        <li class="previous"><a href ="{{url_for('.day',day_value = prev_day,month=prev_month,year=prev_year)}}">Previous Day</a></li>
-        <li class="next"><a href="{{url_for('.day',day_value = next_day,month=next_month,year=next_year)}}">Next Day</a></li>
+        <li class="previous"><a href ="{{url_for('user_app.day',day_value = prev_day,month=prev_month,year=prev_year)}}">Previous Day</a></li>
+        <li class="next"><a href="{{url_for('user_app.day',day_value = next_day,month=next_month,year=next_year)}}">Next Day</a></li>
 </ul>
 
 {% for habit,form in form_dict.items() %}
     <h4>{{ habit.habit_name }} </h4>
-    <form method="POST" action="{{ url_for('.day',day_value=day,month=month,year=year)}}" role="form">
+    <form method="POST" action="{{ url_for('user_app.day',day_value=day,month=month,year=year)}}" role="form">
 
     {{ form.hidden_tag() }}
 

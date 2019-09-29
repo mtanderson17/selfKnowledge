@@ -23,7 +23,7 @@
           {% endif %}
       
           {% from "_formhelpers.html" import render_field %}
-          <form method="POST" action="{{ url_for('.add_habit')}}" role="form">
+          <form method="POST" action="{{ url_for('user_app.add_habit')}}" role="form">
       
             {{ form.hidden_tag() }}
       

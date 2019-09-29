@@ -10,7 +10,7 @@
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user.is_authenticated %}
                 <li>
-                    <p class="navbar-text">Welcome, <a href="#" class="navbar-link">{{ current_user.email }}</a></p>
+                    <p class="navbar-text">Welcome, <a href="{{url_for('user_app.manage_account')}}" class="navbar-link">{{ current_user.email }}</a></p>
                 </li>
 
                 <li>
