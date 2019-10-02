@@ -58,17 +58,17 @@ class Day(db.Model):
     date = db.Column(db.DateTime(), default=datetime.datetime.utcnow,nullable=False)
     habit_id = db.Column(db.Integer(),db.ForeignKey('habits.id'))
     user_id = db.Column(db.Integer(),db.ForeignKey('users.id'))
-    habit_complete = db.Column(db.Boolean(),default=False)
-    day_desc = db.Column(db.String())
+    habit_complete = db.Column(db.Boolean())
+  
 
     habit = relationship("Habit", back_populates="days")
 
-    def __init__(self,date,habit_id,user_id,habit_complete,day_desc):
+    def __init__(self,date,habit_id,user_id,habit_complete):
         self.date = date
         self.habit_id = habit_id
         self.user_id = user_id
         self.habit_complete = habit_complete
-        self.day_desc = day_desc
+       
 
     def __repr__(self):
         return f'{self.date}:{self.habit_id}:{self.habit_complete}'

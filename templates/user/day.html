@@ -23,20 +23,30 @@
         <li class="next"><a href="{{url_for('user_app.day',day_value = next_day,month=next_month,year=next_year)}}">Next Day</a></li>
 </ul>
 
-{% for habit,form in form_dict.items() %}
-    <h4>{{ habit.habit_name }} </h4>
-    <form method="POST" action="{{ url_for('user_app.day',day_value=day,month=month,year=year)}}" role="form">
+<form method="POST" action="{{ url_for('user_app.day',day_value=day,month=month,year=year)}}" role="form">
+        <table class='table'>
+            <thead class="thead-dark">
+            <tr>
+                <th scope='col'>Habit</th>
+                <th scope='col'>Completed</th>
+            </tr>
+            </thead>
+            <tbody>
+    {% for habit,day_info in day_info_dict.items() %}
+            <tr>
+                <td> {{ habit|upper }} </td>
+   
+                {% if day_info.habit_complete == True %}
+                <td><input type=checkbox name={{habit.id}} value={{habit.id}} checked></td>
+                {% else %}
+                <td><input type=checkbox name={{habit.id}} value={{habit.id}}  ></td>
 
-    {{ form.hidden_tag() }}
-
-    {{ render_field(form.habit_complete, class='form-control') }}
-    {{ render_field(form.day_desc, class='form-control') }}
-    <input value = {{habit.id}} type="hidden" name="habit_id">
-
-    <button type="submit" class="btn btn-default">Log Habit</button>
-
-    </form>
-{% endfor %}
-
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+<button type="submit" class="btn btn-default">Log Day</button>
+</form>
 
 {% endblock %}

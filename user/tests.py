@@ -1,6 +1,7 @@
 import unittest
 from flask import session
 from flask_login import current_user
+from werkzeug import ImmutableMultiDict
 import datetime
 
 from application import create_app as create_app_base
@@ -14,6 +15,7 @@ class UserTest(unittest.TestCase):
     def setUp(self):
         self.app_factory = self.create_app()
         
+        #TODO:
         #There has to be a better way to do this
         @self.app_factory.context_processor
         def inject_now():
@@ -100,13 +102,11 @@ class UserTest(unittest.TestCase):
         date = datetime.datetime(year=2019,month=1,day=1)
         user = User.query.filter_by(email='matt@example.com').first()
         habit = Habit.query.filter_by(user_id = user.id).first()
-
-        user_id = user.id
-        habit_id = habit.id
-        
-        rv = self.app.post(f'/day/2019/1/1',data=dict(habit_id = habit.id,habit_complete=True,day_desc='testing'))
-    
-        day_info = Day.query.filter_by(user_id=user_id,habit_id=habit_id,date=date).first()
+       
+        data = ImmutableMultiDict([(f'{habit.id}', f'{habit.id}')])
+        rv = self.app.post(f'/day/2019/1/1',data=dict([("1","1")]))
+  
+        day_info = Day.query.filter_by(user_id=user.id,habit_id=habit.id,date=date).first()
 
         assert day_info.habit_complete == True 
 

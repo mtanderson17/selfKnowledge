@@ -102,7 +102,6 @@ def delete_habit(habit):
 def day(year,month,day_value):
     error = None
     message = None
-    form = DayForm()
     
     date = datetime.date(int(year),int(month),int(day_value))
 
@@ -113,38 +112,41 @@ def day(year,month,day_value):
     #Get user and habits
     user = current_user
     habits = Habit.query.filter_by(user_id=user.id).all()
-
-    if form.validate_on_submit():
-        habit_id = request.form.get("habit_id") #form hidden input
-
-        #Updating day by deleting record and writing new one, probably better way to do this
-        day_info = Day.query.filter_by(user_id=user.id,habit_id = habit_id, date=date).first()
-        if day_info:
-            db.session.delete(day_info)
-            db.session.commit()
-
-        day = Day(
-            date = date,
-            habit_id = habit_id,
-            user_id = user.id,
-            habit_complete = form.habit_complete.data,
-            day_desc = form.day_desc.data
-        )
-        db.session.add(day)
-        db.session.commit()
-
-        return redirect(url_for("user_app.day",day_value=day_value,month=month,year=year))
-    
    
     #if there is already information in days then prepopulate forms
-    form_dict = {}
+    day_info_dict = {}
     for habit in habits:
         dayinfo = Day.query.filter_by(user_id=user.id,habit_id = habit.id, date=date).first()
         if dayinfo:
-            form = DayForm(obj=dayinfo)
+            day_info_dict[habit] = dayinfo
         else:
-            form = DayForm()
-        form_dict[habit] = form
+            day_info_dict[habit] = None
+    
+    #Get data from form
+    if request.method == 'POST':
+        #Delete current day info
+        day_info = Day.query.filter_by(user_id=user.id,date=date).all()
+        for day in day_info:
+            db.session.delete(day)
+            db.session.commit()
+        #Get data
+        print(request.form)
+        data = [int(value) for value in request.form]
+        for habit in habits:
+            if habit.id in data:
+                habit_complete = True
+            else:
+                habit_complete = False
+            day = Day(
+                    date = date,
+                    habit_id = habit.id,
+                    user_id = current_user.id,
+                    habit_complete = habit_complete
+                )
+            db.session.add(day)
+            db.session.commit()
+
+        return redirect(url_for('user_app.day',year=year,month=month,day_value=day_value))
 
     #TODO:
     #This does not appear to work
@@ -153,8 +155,7 @@ def day(year,month,day_value):
 
     return render_template('user/day.html',message=message,error=error,day=day_value,month=month,year=year,
     prev_day = prev_day, prev_month = prev_month, prev_year = prev_year, next_day = next_day, next_month = next_month, next_year = next_year,
-    form_dict=form_dict,habits=habits)
-
+    habits=habits, day_info_dict=day_info_dict)
 
 @user_app.route('/manage_account',methods=('GET','POST'))
 @login_required

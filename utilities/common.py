@@ -52,9 +52,7 @@ def process_file_upload(json_data):
                 date = date,
                 habit_id = habits_dict[cols.pop(0).lower()],
                 user_id = current_user.id,
-                habit_complete = bool(value),
-                day_desc = None #incorporate this later
-
+                habit_complete = bool(value)
             )
             db.session.add(day)
         db.session.commit()
