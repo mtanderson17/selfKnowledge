@@ -56,7 +56,8 @@ def process_file_upload(json_data):
             )
             db.session.add(day)
         db.session.commit()
-        
+    
+    return message
  
     
 

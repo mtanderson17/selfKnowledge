@@ -6,13 +6,21 @@
 
 {% include "navbar.html" %}
 
-{% if error %}
-<div class="error text-danger">{{ error }}</div>
-{% endif %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for category, message in messages %}
+    {%if category == 'SUCCESS'%}
+    <div class="alert alert-success" role="alert">{{ message }}</div>
+    {% else %}
+    <div class="error text-danger">{{ message }}</div>
+    {%endif%}
 
-{% if message %}
-<div class="alert alert-success" role="alert">{{ message }}</div>
-{% endif %}
+    {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% endwith %}
 
 {% from "_formhelpers.html" import render_field %}
 
@@ -44,6 +52,21 @@
                 {% endif %}
             </tr>
         {% endfor %}
+
+        {% if daydesc == None %}
+
+        <td>
+            <textarea id='dayDesc' class='text' name="dayDesc" placeholder ="How was your day?" cols="90" rows="5"></textarea>
+        </td>
+
+
+        {% else %}
+        <td>
+            <textarea id='dayDesc' class='text' name="dayDesc" placeholder ="How was your day?" cols="90" rows="5">{{daydesc}}</textarea>
+        </td>
+
+        {% endif %}
+       
     </tbody>
     </table>
 <button type="submit" class="btn btn-default">Log Day</button>

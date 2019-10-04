@@ -10,8 +10,8 @@ import json
 
 
 from application import db
-from user.models import User, Habit,Day
-from user.forms import HabitForm,DayForm
+from user.models import User, Habit, Day, DayDesc
+from user.forms import HabitForm
 from utilities.common import get_monthdelta_ints, process_file_upload
 
 user_app = Blueprint('user_app', __name__)
@@ -100,8 +100,7 @@ def delete_habit(habit):
 @user_app.route("/day/<year>/<month>/<day_value>",methods=("GET","POST"))
 @login_required
 def day(year,month,day_value):
-    error = None
-    message = None
+
     
     date = datetime.date(int(year),int(month),int(day_value))
 
@@ -110,28 +109,46 @@ def day(year,month,day_value):
     next_day,next_month,next_year = get_monthdelta_ints(date,days=1)
 
     #Get user and habits
-    user = current_user
-    habits = Habit.query.filter_by(user_id=user.id).all()
+    habits = Habit.query.filter_by(user_id=current_user.id).all()
+    daydesc = DayDesc.query.filter_by(user_id=current_user.id,date=date).first()
+    if daydesc:
+        daydesc = daydesc.text
+    
+    print(daydesc)
+
    
     #if there is already information in days then prepopulate forms
     day_info_dict = {}
     for habit in habits:
-        dayinfo = Day.query.filter_by(user_id=user.id,habit_id = habit.id, date=date).first()
+        dayinfo = Day.query.filter_by(user_id=current_user.id,habit_id = habit.id, date=date).first()
         if dayinfo:
             day_info_dict[habit] = dayinfo
         else:
             day_info_dict[habit] = None
-    
+
+ 
     #Get data from form
     if request.method == 'POST':
         #Delete current day info
-        day_info = Day.query.filter_by(user_id=user.id,date=date).all()
+        day_info = Day.query.filter_by(user_id=current_user.id,date=date).all()
         for day in day_info:
             db.session.delete(day)
             db.session.commit()
-        #Get data
-        print(request.form)
-        data = [int(value) for value in request.form]
+
+        #Get Desc Data
+        desc = request.form['dayDesc']
+
+        daydesc = DayDesc(
+            date = date,
+            user_id = current_user.id,
+            text = desc 
+        )
+
+        db.session.add(daydesc)
+        db.session.commit()
+
+        #Get habit data
+        data = [int(value) for value in request.form if value != 'dayDesc']
         for habit in habits:
             if habit.id in data:
                 habit_complete = True
@@ -146,16 +163,18 @@ def day(year,month,day_value):
             db.session.add(day)
             db.session.commit()
 
+        flash('Day Updated :)','SUCCESS')
+
         return redirect(url_for('user_app.day',year=year,month=month,day_value=day_value))
 
-    #TODO:
-    #This does not appear to work
-    if habits is None:
-        error = 'Go add some habits!'
+ 
+    if len(habits) == 0:
+        #Could potential add link to redirect?
+        flash('Go add some habits!','ERROR')
 
-    return render_template('user/day.html',message=message,error=error,day=day_value,month=month,year=year,
+    return render_template('user/day.html',day=day_value,month=month,year=year,
     prev_day = prev_day, prev_month = prev_month, prev_year = prev_year, next_day = next_day, next_month = next_month, next_year = next_year,
-    habits=habits, day_info_dict=day_info_dict)
+    habits=habits, day_info_dict=day_info_dict,daydesc=daydesc)
 
 @user_app.route('/manage_account',methods=('GET','POST'))
 @login_required
@@ -172,6 +191,11 @@ def upload_data():
         except:
             flash('File Upload Error! - ensure extension is .xlsx, .xls, .xlsx, .csv - ensure first column is valid date - ensure column names align to habits','ERROR')
 
-        process_file_upload(json_data)
+        messages = process_file_upload(json_data)
+
+        if len(messages) > 0:
+            for message in messages:
+                flash(message,'ERROR')
+
         return redirect(url_for('user_app.manage_account'))
     return redirect(url_for("user_app.manage_account"))

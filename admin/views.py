@@ -5,7 +5,7 @@ from flask_admin import AdminIndexView
 from sqlalchemy import inspect
 
 from application import db, admin
-from user.models import User,Habit,Day,UserTypeModel
+from user.models import User,Habit,Day,UserTypeModel,DayDesc
 
 admin_app = Blueprint('admin_app', __name__)
 
@@ -42,7 +42,13 @@ class ChildViewDay(AdminRequiredMixin):
     column_hide_backrefs = False
     column_list = [c_attr.key for c_attr in inspect(Day).mapper.column_attrs]
 
+class ChildViewDayDesc(AdminRequiredMixin):
+    column_display_pk = True 
+    column_hide_backrefs = False
+    column_list = [c_attr.key for c_attr in inspect(DayDesc).mapper.column_attrs]
+
 
 admin.add_view(AdminRequiredMixin(User, db.session))
 admin.add_view(ChildViewHabit(Habit, db.session))
 admin.add_view(ChildViewDay(Day, db.session))
+admin.add_view(ChildViewDayDesc(DayDesc,db.session))
