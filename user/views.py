@@ -17,42 +17,6 @@ from utilities.common import get_monthdelta_ints, process_file_upload
 user_app = Blueprint('user_app', __name__)
 
 
-@user_app.route('/profile')
-@user_app.route('/profile/<year>/<month>', methods=('GET', 'POST'))
-@login_required
-def profile(year=None,month=None):
-
-    if year is None or month is None:
-        year = datetime.datetime.now().year
-        month = datetime.datetime.now().month
-
-    year = int(year)
-    month = int(month)
-
-    #Values for next and previous button
-    date = datetime.date(year,month,1)
-    _,prev_month,prev_year = get_monthdelta_ints(date,months=-1)
-    _,next_month,next_year = get_monthdelta_ints(date,months=1)
-    
-
-    cal = calendar.HTMLCalendar().formatmonth(year,month)
-    soup = BeautifulSoup(cal, 'html.parser')
-    for td in soup('td'):
-        try:
-            day = int(td.text)
-            url = f"/day/{year}/{month}/{day}"
-            day_url_tag = soup.new_tag("a",href=url)
-            day_url_tag.string = str(day) #value of the date, may want to change this to whole td later
-            td.string.replace_with(day_url_tag) # take '1' and replace with <a href=url> 1 </a>
-        except:
-            pass
-    html_cal = str(soup.prettify('utf-8',formatter=None))
-    html_cal = html_cal[2:-1] #replace the b'' not sure why thats there
-    html_cal = html_cal.replace("\\n","")
-    html_cal = html_cal.replace("\\","")
-
-    return render_template('user/profile.html', calendar = html_cal,month=month,year=year, prev_month = prev_month, 
-    prev_year = prev_year,next_month=next_month,next_year=next_year)
 
 @user_app.route('/add_habit', methods=('GET', 'POST'))
 @login_required

@@ -10,9 +10,13 @@
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user.is_authenticated %}
                 <li>
-                    <p class="navbar-text">Welcome, <a href="{{url_for('user_app.manage_account')}}" class="navbar-link">{{ current_user.email }}</a></p>
+                    <p class="navbar-text"><a href="{{url_for('user_app.manage_account')}}" class="navbar-link">{{ current_user.email }}</a></p>
                 </li>
 
+                <li>
+                        <a href="{{ url_for('insights_app.profile') }}" class="navbar-link">Profile</a></p>
+                    </li> 
+                
                 <li>
                     <a href="{{url_for('user_app.day',day_value = now.day,month=now.month,year=now.year)}}" class="navbar-link">Your Day</a>
                 </li>
@@ -21,9 +25,7 @@
                     <a href="{{ url_for('user_app.add_habit') }}" class="navbar-link">Manage Habits</a></p>
                 </li> 
 
-                <li>
-                    <a href="{{ url_for('user_app.profile') }}" class="navbar-link">Profile</a></p>
-                </li> 
+              
 
 
 

@@ -36,6 +36,9 @@ def create_app(config_obj = 'settings.DevelopmentConfig',**config_overrides):
     from user.views import user_app
     app.register_blueprint(user_app)
 
+    from insights.views import insights_app
+    app.register_blueprint(insights_app)
+
     from admin.views import admin_app
     app.register_blueprint(admin_app)
 
