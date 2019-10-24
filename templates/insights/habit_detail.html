@@ -6,11 +6,65 @@
 
 {% include "navbar.html" %}
 
-<h4> {{ habit }}</h4>
+<head lang="en">
+        <meta charset="UTF-8">
+        <title>{{ habit }} </title>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+</head>
+
+<h4> {{ habit | upper }}</h4>
+
+<h4> Here's how you've been doing </h4>
 
 <div>
-    {{ insights }}
+    <table class="table .table-striped">
+        <tr>
+            <th>Statistic</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td> Total Days Complete </td>
+            <td> {{ insights['habit_summary']['habit_sum'] }} </td>
+        </tr>
+        <tr>
+            <td>Number of Months Tracked</td>
+            <td> {{ insights['habit_summary']['habit_desc']['count']  }}</td>
+        </tr>
+        <tr>
+            <td>Average Per Month</td>
+            <td> {{ insights['habit_summary']['habit_desc']['mean']  }}</td>
+        </tr>
+        <tr>
+            <td>Max in Month</td>
+            <td> {{ insights['habit_summary']['habit_desc']['max']  }}</td>
+        </tr>
+        <tr>
+            <td>Min in Month</td>
+            <td> {{ insights['habit_summary']['habit_desc']['min']  }}</td>
+        </tr>
+
+    </table>
+
 </div>
 
+<body>
+        <div class="container">
+
+            <h4> You've done a lot </h4>
+        
+                <div class="col-md-6">
+       
+                    <div class="chart" id="bargraph">
+                        <script>
+                            var graphs = {{insights['habit_summary']['month_graph'] | safe}};
+                            Plotly.plot('bargraph',graphs,{});
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+</body>
 
 {% endblock %}

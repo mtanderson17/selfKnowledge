@@ -45,7 +45,7 @@ def profile(year=None,month=None):
     habits = Habit.query.filter_by(user_id=current_user.id).all()
 
     #Add insights
-    insights = load_profile_data(month)
+    insights = load_profile_data(current_user,month)
 
     return render_template('insights/profile.html', calendar = html_cal,month=month,year=year, prev_month = prev_month, 
     prev_year = prev_year,next_month=next_month,next_year=next_year,habits=habits,insights=insights)
@@ -55,7 +55,8 @@ def profile(year=None,month=None):
 @login_required
 def habit_detail(habit):
     habit = Habit.query.filter_by(user_id=current_user.id,habit_name=habit).first()
-    insights = load_habit_data(habit)
+    insights = json.loads(load_habit_data(current_user,habit))
+   
 
     return render_template('insights/habit_detail.html',habit=habit.habit_name,insights=insights)
 
