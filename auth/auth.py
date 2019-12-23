@@ -8,7 +8,6 @@ from user.models import User
 
 auth = Blueprint('auth', __name__)
 
-
 @auth.route('/register', methods=('POST','GET'))
 def register():
     form = RegisterForm()

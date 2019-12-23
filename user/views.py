@@ -78,9 +78,7 @@ def day(year,month,day_value):
     if daydesc:
         daydesc = daydesc.text
     
-    print(daydesc)
 
-   
     #if there is already information in days then prepopulate forms
     day_info_dict = {}
     for habit in habits:

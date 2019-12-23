@@ -44,9 +44,7 @@ def load_profile_data(current_user,month):
 
     days_with_data = get_data_days_count(current_user)
     data['days_with_data'] = days_with_data
-
     data['month_progress'] = get_month_results(current_user,month)
-    print(data)
 
     json_data = json.dumps(data)
 
@@ -61,12 +59,8 @@ def load_habit_data(current_user,habit):
     habit_summary  = get_days_habit_complete(current_user,habit)
     data['habit_summary'] = habit_summary
     
-  
-
     json_data = json.dumps(data)
  
-
-
     return json_data
 
 #Profile functions
